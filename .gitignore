@@ -1,0 +1,19 @@
+
+# Configuracion privada
+php-api/public/config.php
+
+# Variables de entorno
+.env
+.env.*
+!.env.example
+
+# Archivos temporales de Python
+__pycache__/
+*.pyc
+
+# Dependencias
+node_modules/
+
+# Archivos del sistema
+.DS_Store
+Thumbs.db

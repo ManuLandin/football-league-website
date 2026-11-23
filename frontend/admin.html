@@ -1,0 +1,871 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="../img/logo.jpg" type="image/x-icon">
+  <title>Panel Administrador | Liga Infantil y Juvenil de las Estrellas</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css?v=20260425e">
+</head>
+<body>
+  <nav class="navbar navbar-dark bg-dark shadow-sm fixed-top">
+    <div class="container-fluid">
+      <a class="navbar-brand d-flex align-items-center" href="index.html">
+        <img src="../img/logo.jpg" alt="Logo" class="brand-logo me-2">
+        <span>Panel Admin · Liga de las Estrellas</span>
+      </a>
+      <div class="d-flex align-items-center gap-2">
+        <span class="token-chip d-none" id="user-chip"><i class="fa-solid fa-user-shield"></i><span id="user-name"></span></span>
+        <button class="btn btn-outline-light btn-sm" id="logout-btn" type="button"><i class="fa-solid fa-right-from-bracket"></i> Salir</button>
+      </div>
+    </div>
+  </nav>
+
+  <header class="admin-hero text-light">
+    <div class="container position-relative">
+      <div class="row align-items-center g-4">
+        <div class="col-lg-7">
+          <p class="badge bg-primary text-uppercase">Panel de administrador</p>
+          <h1 class="display-5 fw-bold">Liga Infantil y Juvenil de las Estrellas</h1>
+          <p class="lead">Gestiona equipos, categorías, jugadores, tablas de posiciones y genera PDFs oficiales con seguridad y trazabilidad.</p>
+          <div class="d-flex flex-wrap gap-3 mt-3">
+            <a href="#app" class="btn btn-primary">Ir al panel</a>
+            <a href="index.html" class="btn btn-light-outline">Ver sitio público</a>
+          </div>
+        </div>
+        <div class="col-lg-5">
+          <div class="panel-card p-4" id="auth-view">
+            <h5 class="mb-3">Ingreso seguro</h5>
+            <form id="login-form" class="needs-validation" novalidate>
+              <div class="mb-3">
+                <label class="form-label">Email</label>
+                <input type="email" class="form-control" id="login-email" required>
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Contraseña</label>
+                <input type="password" class="form-control" id="login-password" required>
+              </div>
+              <button class="btn btn-primary w-100" type="submit">Entrar</button>
+              <div class="form-text mt-2">El alta de nuevos administradores se hace desde el panel una vez autenticado.</div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="container py-5" id="app" style="display:none;">
+    <div class="row g-4 mb-4">
+      <div class="col-md-3">
+        <div class="panel-card p-3 h-100" id="summary-card-team">
+          <div class="d-flex align-items-center justify-content-between mb-2">
+            <span class="small-label" id="summary-label-team">Equipos</span>
+            <i class="fa-solid fa-people-group text-success" id="summary-icon-team"></i>
+          </div>
+          <div class="d-flex align-items-center gap-3">
+            <div id="summary-team-crest-wrap" class="summary-crest-wrap d-none"></div>
+            <div class="flex-grow-1 min-w-0">
+              <p class="h4 mb-0" id="summary-teams">0</p>
+              <div class="small text-secondary mt-1" id="summary-team-meta"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="panel-card p-3 h-100" id="summary-card-category">
+          <div class="d-flex align-items-center justify-content-between mb-2">
+            <span class="small-label" id="summary-label-category">Categorías</span>
+            <i class="fa-solid fa-layer-group text-info" id="summary-icon-category"></i>
+          </div>
+          <p class="h4 mb-0" id="summary-categories">0</p>
+          <div class="small text-secondary mt-1" id="summary-category-meta"></div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="panel-card p-3 h-100" id="summary-card-player">
+          <div class="d-flex align-items-center justify-content-between mb-2">
+            <span class="small-label" id="summary-label-player">Jugadores</span>
+            <i class="fa-solid fa-user text-warning" id="summary-icon-player"></i>
+          </div>
+          <p class="h4 mb-0" id="summary-players">0</p>
+          <div class="small text-secondary mt-1" id="summary-player-meta"></div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="panel-card p-3 h-100" id="summary-card-pdf">
+          <div class="d-flex align-items-center justify-content-between mb-2">
+            <span class="small-label">PDFs</span>
+            <i class="fa-solid fa-file-pdf text-danger"></i>
+          </div>
+          <p class="h6 mb-1">Genera cédulas</p>
+          <div class="d-flex justify-content-between align-items-center">
+            <button class="btn btn-sm btn-outline-primary" id="summary-pdf-btn" type="button">
+              Descargar PDF
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <ul class="nav nav-pills mb-4" id="admin-tabs" role="tablist">
+      <li class="nav-item" role="presentation">
+        <button class="nav-link active" data-bs-toggle="pill" data-bs-target="#tab-equipos" type="button">Equipos</button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-categorias" type="button">Categorías</button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-jugadores" type="button">Jugadores</button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-tabla" type="button">Tabla de posiciones</button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-pdf" type="button">PDF</button>
+      </li>
+      <li class="nav-item super-only-tab d-none" role="presentation">
+        <button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-noticias" type="button"><i class="fa-solid fa-newspaper me-1"></i>Noticias</button>
+      </li>
+      <li class="nav-item super-only-tab d-none" role="presentation">
+        <button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-eventos" type="button"><i class="fa-solid fa-calendar-star me-1"></i>Eventos</button>
+      </li>
+      <li class="nav-item super-only-tab d-none" role="presentation">
+        <button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-partidos" type="button"><i class="fa-solid fa-futbol me-1"></i>Partidos</button>
+      </li>
+      <li class="nav-item super-only-tab d-none" role="presentation">
+        <button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-arbitros" type="button"><i class="fa-solid fa-whistle me-1"></i>Árbitros</button>
+      </li>
+      <li class="nav-item super-only-tab d-none" role="presentation">
+        <button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-admins" type="button">Administradores</button>
+      </li>
+      <li class="nav-item super-only-tab d-none" role="presentation">
+        <button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-bitacora" type="button"><i class="fa-solid fa-clock-rotate-left me-1"></i>Bitácora</button>
+      </li>
+    </ul>
+
+    <div class="tab-content">
+      <div class="tab-pane fade show active" id="tab-equipos">
+        <div class="row g-4">
+          <div class="col-lg-4">
+            <div class="panel-card p-4 h-100">
+              <h5 class="mb-3">Crear equipo</h5>
+              <form id="team-form">
+                <div class="mb-3">
+                  <label class="form-label">Nombre del equipo</label>
+                  <input type="text" class="form-control" id="team-name" required>
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">Entrenador</label>
+                  <input type="text" class="form-control" id="team-coach" placeholder="Nombre del entrenador">
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">Teléfono</label>
+                  <input type="tel" class="form-control" id="team-phone" placeholder="+34 600 123 456">
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">Email</label>
+                  <input type="email" class="form-control" id="team-email">
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">Ciudad</label>
+                  <input type="text" class="form-control" id="team-city" placeholder="Madrid, Barcelona...">
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">Sede / Estadio</label>
+                  <input type="text" class="form-control" id="team-venue" placeholder="Estadio Municipal...">
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">Descripción (opcional)</label>
+                  <textarea class="form-control" id="team-description" rows="2"></textarea>
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">Escudo / Logo (opcional)</label>
+                  <input type="file" class="form-control" id="team-crest" accept="image/*">
+                  <div id="team-crest-preview" class="mt-2"></div>
+                </div>
+                <button class="btn btn-primary w-100" type="submit">Guardar</button>
+              </form>
+            </div>
+          </div>
+          <div class="col-lg-8">
+            <div class="table-card p-3">
+              <div class="d-flex justify-content-between align-items-center mb-2">
+                <h6 class="mb-0">Equipos registrados</h6>
+              </div>
+              <div class="table-responsive">
+                <table class="table table-dark table-hover align-middle mb-0">
+                  <thead><tr><th style="width:52px;">Escudo</th><th>Nombre</th><th class="text-end">Acciones</th></tr></thead>
+                  <tbody id="teams-table"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="tab-pane fade" id="tab-categorias">
+        <div class="row g-4">
+          <div class="col-lg-4 d-flex flex-column gap-4">
+            <div class="panel-card p-4">
+              <h5 class="mb-3">Crear categoría global</h5>
+              <form id="category-master-form">
+                <div class="mb-3">
+                  <label class="form-label">Nombre de la categoría</label>
+                  <input type="text" class="form-control" id="category-master-name" placeholder="Sub-10, Sub-12, etc." required>
+                </div>
+                <button class="btn btn-primary w-100" type="submit">Crear categoría</button>
+              </form>
+            </div>
+            <div class="panel-card p-4 h-100">
+              <h5 class="mb-3">Asignar categoría a equipo</h5>
+              <form id="category-form">
+                <div class="mb-3">
+                  <label class="form-label">Equipo</label>
+                  <select id="category-team" class="form-select" required></select>
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">Categoría existente</label>
+                  <select id="category-existing" class="form-select" required></select>
+                </div>
+                <button class="btn btn-primary w-100" type="submit">Asignar</button>
+              </form>
+            </div>
+          </div>
+          <div class="col-lg-8 d-flex flex-column gap-4">
+            <div class="table-card p-3">
+              <h6 class="mb-2">Categorías globales</h6>
+              <div class="table-responsive">
+                <table class="table table-dark table-hover align-middle mb-0">
+                  <thead><tr><th>Nombre</th></tr></thead>
+                  <tbody id="categories-master-table"></tbody>
+                </table>
+              </div>
+            </div>
+            <div class="table-card p-3">
+              <div class="d-flex justify-content-between align-items-center mb-2">
+                <h6 class="mb-0">Categorías asignadas por equipo</h6>
+                <select id="category-filter-team" class="form-select form-select-sm w-auto"></select>
+              </div>
+              <div class="table-responsive">
+                <table class="table table-dark table-hover align-middle mb-0">
+                  <thead><tr><th>Nombre</th><th>Equipo</th><th class="text-end">Acciones</th></tr></thead>
+                  <tbody id="categories-table"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="tab-pane fade" id="tab-jugadores">
+        <div class="row g-4">
+          <div class="col-lg-5">
+            <div class="panel-card p-4 h-100">
+              <h5 class="mb-3">Agregar jugador</h5>
+              <form id="player-form">
+                <div class="mb-3">
+                  <label class="form-label">Equipo</label>
+                  <select id="player-team" class="form-select" required></select>
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">Categoría</label>
+                  <select id="player-category" class="form-select" required></select>
+                </div>
+                <div class="row g-3">
+                  <div class="col-12">
+                    <label class="form-label">Nombre</label>
+                    <input type="text" class="form-control" id="player-name" required>
+                  </div>
+                  <div class="col-12">
+                    <label class="form-label">Apellidos</label>
+                    <input type="text" class="form-control" id="player-lastname" required>
+                  </div>
+                  <div class="col-md-6">
+                    <label class="form-label">Fecha de nacimiento</label>
+                    <input type="date" class="form-control" id="player-born" required>
+                  </div>
+                  <div class="col-md-6">
+                    <label class="form-label">Número</label>
+                    <input type="number" class="form-control" id="player-number" required>
+                  </div>
+                  <div class="col-md-6">
+                    <label class="form-label">Estatura (m)</label>
+                    <input type="number" step="0.01" min="0.5" max="2.5" class="form-control" id="player-estatura" placeholder="1.65">
+                  </div>
+                  <div class="col-md-6">
+                    <label class="form-label">Peso (kg)</label>
+                    <input type="number" step="0.1" min="10" max="200" class="form-control" id="player-peso" placeholder="60.5">
+                  </div>
+                  <div class="col-12">
+                    <label class="form-label">Alergias / Condiciones médicas</label>
+                    <input type="text" class="form-control" id="player-alergias" placeholder="Ninguna">
+                  </div>
+                  <div class="col-md-6">
+                    <label class="form-label">Nombre del papá <span class="text-secondary small">(opcional)</span></label>
+                    <input type="text" class="form-control" id="player-nombre-papa" placeholder="Opcional">
+                  </div>
+                  <div class="col-md-6">
+                    <label class="form-label">Nombre de la mamá <span class="text-secondary small">(opcional)</span></label>
+                    <input type="text" class="form-control" id="player-nombre-mama" placeholder="Opcional">
+                  </div>
+                  <div class="col-md-8">
+                    <label class="form-label">Escuela <span class="text-secondary small">(opcional)</span></label>
+                    <input type="text" class="form-control" id="player-escuela" placeholder="Opcional">
+                  </div>
+                  <div class="col-md-4">
+                    <label class="form-label">Grado escolar <span class="text-secondary small">(opcional)</span></label>
+                    <input type="text" class="form-control" id="player-grado-escolar" placeholder="Opcional">
+                  </div>
+                  <div class="col-md-4">
+                    <label class="form-label">Teléfono casa <span class="text-secondary small">(opcional)</span></label>
+                    <input type="text" class="form-control" id="player-telefono-casa" placeholder="Opcional">
+                  </div>
+                  <div class="col-md-4">
+                    <label class="form-label">Teléfono mamá <span class="text-secondary small">(opcional)</span></label>
+                    <input type="text" class="form-control" id="player-telefono-mama" placeholder="Opcional">
+                  </div>
+                  <div class="col-md-4">
+                    <label class="form-label">Teléfono papá <span class="text-secondary small">(opcional)</span></label>
+                    <input type="text" class="form-control" id="player-telefono-papa" placeholder="Opcional">
+                  </div>
+                  <div class="col-md-6">
+                    <label class="form-label">Tipo sanguíneo <span class="text-secondary small">(opcional)</span></label>
+                    <input type="text" class="form-control" id="player-tipo-sanguineo" placeholder="O+, A-, etc.">
+                  </div>
+                  <div class="col-12">
+                    <label class="form-label">Fotografía (opcional)</label>
+                    <input type="file" class="form-control" id="player-photo" accept="image/*">
+                    <div id="player-photo-preview" class="mt-2"></div>
+                  </div>
+                </div>
+                <button class="btn btn-primary w-100 mt-3" type="submit">Guardar</button>
+              </form>
+            </div>
+          </div>
+          <div class="col-lg-7">
+            <div class="table-card p-3">
+              <div class="d-flex justify-content-between align-items-center mb-2">
+                <h6 class="mb-0">Jugadores por categoría</h6>
+                <div class="d-flex gap-2">
+                  <select id="player-filter-team" class="form-select form-select-sm w-auto"></select>
+                  <select id="player-filter-category" class="form-select form-select-sm w-auto"></select>
+                </div>
+              </div>
+              <div class="table-responsive">
+                <table class="table table-dark table-hover align-middle mb-0">
+                  <thead><tr><th>#</th><th>Nombre</th><th>Apellidos</th><th>Equipo</th><th class="text-end">Acciones</th></tr></thead>
+                  <tbody id="players-table"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="tab-pane fade" id="tab-tabla">
+        <div class="row g-4">
+          <div class="col-lg-4">
+            <div class="panel-card p-4 h-100">
+              <h5 class="mb-3">Actualizar tabla</h5>
+              <form id="standing-form">
+                <div class="mb-3">
+                  <label class="form-label">Equipo</label>
+                  <select id="standing-team" class="form-select" required></select>
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">Categoría</label>
+                  <select id="standing-category" class="form-select" required></select>
+                </div>
+                <div class="row g-2">
+                  <div class="col-4"><input type="number" class="form-control" id="standing-pj" placeholder="PJ" required></div>
+                  <div class="col-4"><input type="number" class="form-control" id="standing-g" placeholder="G" required></div>
+                  <div class="col-4"><input type="number" class="form-control" id="standing-e" placeholder="E" required></div>
+                  <div class="col-4"><input type="number" class="form-control" id="standing-p" placeholder="P" required></div>
+                  <div class="col-4"><input type="number" class="form-control" id="standing-gf" placeholder="GF" required></div>
+                  <div class="col-4"><input type="number" class="form-control" id="standing-gc" placeholder="GC" required></div>
+                  <div class="col-12"><input type="number" class="form-control" id="standing-pts" placeholder="Puntos" required></div>
+                </div>
+                <button class="btn btn-primary w-100 mt-3" type="submit">Guardar</button>
+              </form>
+            </div>
+          </div>
+          <div class="col-lg-8">
+            <div class="table-card p-3">
+              <div class="d-flex justify-content-between align-items-center mb-2">
+                <h6 class="mb-0">Tabla por categoría</h6>
+                <select id="standing-filter-category" class="form-select form-select-sm w-auto"></select>
+              </div>
+              <div class="table-responsive">
+                <table class="table table-dark table-hover align-middle mb-0">
+                  <thead><tr><th>Equipo</th><th>PJ</th><th>G</th><th>E</th><th>P</th><th>GF</th><th>GC</th><th>Pts</th><th class="text-end">Acciones</th></tr></thead>
+                  <tbody id="standings-table"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB PARTIDOS (solo superadmin) -->
+      <div class="tab-pane fade" id="tab-partidos">
+        <div class="row g-4">
+          <div class="col-lg-4">
+            <div class="panel-card p-4 h-100">
+              <h5 class="mb-3">Crear jornada</h5>
+              <form id="jornada-form">
+                <div class="mb-3">
+                  <label class="form-label">Nombre de la jornada</label>
+                  <input type="text" class="form-control" id="jornada-name" placeholder="Jornada 1" required>
+                </div>
+                <button class="btn btn-primary w-100" type="submit">Guardar jornada</button>
+              </form>
+              <hr class="border-secondary my-4">
+              <h6 class="mb-2">Jornadas registradas</h6>
+              <div class="table-responsive">
+                <table class="table table-dark table-hover align-middle mb-0">
+                  <thead><tr><th>Nombre</th><th class="text-end">Acciones</th></tr></thead>
+                  <tbody id="jornadas-table"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+          <div class="col-lg-4">
+            <div class="panel-card p-4 h-100">
+              <h5 class="mb-3">Programar partido</h5>
+              <form id="match-form">
+                <div class="mb-3">
+                  <label class="form-label">Jornada</label>
+                  <select id="match-jornada" class="form-select" required></select>
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">Categoría</label>
+                  <select id="match-category" class="form-select" required></select>
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">Equipo Local (categoría)</label>
+                  <select id="match-local" class="form-select" required></select>
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">Equipo Visita (categoría)</label>
+                  <select id="match-visita" class="form-select" required></select>
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">Fecha y hora</label>
+                  <input type="datetime-local" class="form-control" id="match-fecha" required>
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">Sede / Estadio</label>
+                  <input type="text" class="form-control" id="match-lugar" placeholder="Estadio Municipal...">
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">Árbitro (opcional)</label>
+                  <select id="match-arbitro" class="form-select">
+                    <option value="">-- Sin asignar --</option>
+                  </select>
+                </div>
+                <button class="btn btn-primary w-100" type="submit">Guardar partido</button>
+              </form>
+            </div>
+          </div>
+          <div class="col-lg-4">
+            <div class="panel-card p-4 h-100" id="result-form-wrap" style="display:none">
+              <h6 class="mb-3">Registrar resultado — <span id="result-match-label" class="text-secondary small"></span></h6>
+              <div class="row g-2 align-items-end">
+                <div class="col-4">
+                  <label class="form-label small">Goles local</label>
+                  <input type="number" class="form-control" id="result-local" min="0" value="0">
+                </div>
+                <div class="col-4">
+                  <label class="form-label small">Goles visita</label>
+                  <input type="number" class="form-control" id="result-visita" min="0" value="0">
+                </div>
+                <div class="col-4">
+                  <button class="btn btn-success w-100" id="result-save">Guardar</button>
+                </div>
+              </div>
+              <div class="mt-2"><span class="badge bg-info" id="result-preview">0 - 0</span></div>
+            </div>
+            <div class="panel-card p-4 mt-3" id="lineup-wrap" style="display:none">
+              <div class="d-flex justify-content-between align-items-center mb-2">
+                <h6 class="mb-0">Alineación del partido</h6>
+                <span class="badge bg-secondary" id="lineup-match-label">--</span>
+              </div>
+              <p class="small text-secondary mb-3">Marca jugadores que van a jugar. Puedes registrar tarjetas amarillas y roja por jugador.</p>
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <h6 class="small text-uppercase text-info">Equipo local</h6>
+                  <div id="lineup-local-list" class="lineup-list"></div>
+                </div>
+                <div class="col-md-6">
+                  <h6 class="small text-uppercase text-warning">Equipo visita</h6>
+                  <div id="lineup-visita-list" class="lineup-list"></div>
+                </div>
+              </div>
+              <div class="d-flex justify-content-end mt-3">
+                <button class="btn btn-primary" id="lineup-save" type="button"><i class="fa-solid fa-floppy-disk me-1"></i>Guardar alineación</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="table-card p-3 mt-4">
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <h6 class="mb-0">Todos los partidos</h6>
+            <div class="d-flex gap-2">
+              <select id="match-filter-estado" class="form-select form-select-sm w-auto">
+                <option value="">Todos</option>
+                <option value="programado">Programados</option>
+                <option value="jugado">Jugados</option>
+              </select>
+            </div>
+          </div>
+          <div class="table-responsive">
+            <table class="table table-dark table-hover align-middle mb-0">
+              <thead><tr><th>Jornada</th><th>Cat.</th><th>Local</th><th>Resultado</th><th>Visita</th><th>Árbitro</th><th>Fecha</th><th>Sede</th><th>Estado</th><th class="text-end">Acciones</th></tr></thead>
+              <tbody id="matches-table"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div class="tab-pane fade" id="tab-pdf">
+        <div class="row g-4">
+          <div class="col-lg-6">
+            <div class="panel-card p-4 h-100">
+              <h5 class="mb-3">Cédula por partido</h5>
+              <div class="row g-3">
+                <div class="col-12">
+                  <label class="form-label">Partido jugado</label>
+                  <select id="pdf-match" class="form-select"></select>
+                </div>
+                <div class="col-12 d-flex align-items-end">
+                  <button class="btn btn-primary w-100" id="pdf-generate" type="button"><i class="fa-solid fa-file-arrow-down"></i> Descargar PDF de partido</button>
+                </div>
+              </div>
+              <div class="form-text mt-2">Requiere resultado y alineación guardada.</div>
+            </div>
+          </div>
+          <div class="col-lg-6">
+            <div class="panel-card p-4 h-100">
+              <h5 class="mb-3">Cédula por equipo</h5>
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <label class="form-label">Equipo</label>
+                  <select id="pdf-team" class="form-select"></select>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">Categoría</label>
+                  <select id="pdf-category" class="form-select"></select>
+                </div>
+                <div class="col-12 d-flex align-items-end">
+                  <button class="btn btn-outline-primary w-100" id="pdf-generate-roster" type="button"><i class="fa-solid fa-users"></i> Descargar PDF de equipo</button>
+                </div>
+              </div>
+              <div class="form-text mt-2">Lista de jugadores activos del equipo en la categoría seleccionada.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB NOTICIAS (solo superadmin) -->
+      <div class="tab-pane fade" id="tab-noticias">
+        <div class="row g-4">
+          <div class="col-lg-4">
+            <div class="panel-card p-4 h-100">
+              <h5 class="mb-3">Crear noticia</h5>
+              <form id="news-form">
+                <div class="mb-3">
+                  <label class="form-label">Título</label>
+                  <input type="text" class="form-control" id="news-title" required>
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">Contenido</label>
+                  <textarea class="form-control" id="news-content" rows="3" required></textarea>
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">Orden (prioridad)</label>
+                  <input type="number" class="form-control" id="news-order" value="0" min="0">
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">Imagen (opcional)</label>
+                  <input type="file" class="form-control" id="news-image" accept="image/*">
+                  <div id="news-image-preview" class="mt-2"></div>
+                </div>
+                <button class="btn btn-primary w-100" type="submit">Guardar noticia</button>
+              </form>
+            </div>
+          </div>
+          <div class="col-lg-8">
+            <div class="table-card p-3">
+              <div class="d-flex justify-content-between align-items-center mb-2">
+                <h6 class="mb-0">Noticias publicadas</h6>
+              </div>
+              <div class="table-responsive">
+                <table class="table table-dark table-hover align-middle mb-0">
+                  <thead><tr><th style="width:60px;">Img</th><th>Título</th><th>Orden</th><th class="text-end">Acciones</th></tr></thead>
+                  <tbody id="news-table"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB ÁRBITROS (solo superadmin) -->
+      <div class="tab-pane fade" id="tab-eventos">
+        <div class="row g-4">
+          <div class="col-lg-4">
+            <div class="panel-card p-4 h-100">
+              <h5 class="mb-3">Crear evento</h5>
+              <form id="event-form">
+                <div class="mb-3">
+                  <label class="form-label">Título</label>
+                  <input type="text" class="form-control" id="event-title" required>
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">Contenido</label>
+                  <textarea class="form-control" id="event-content" rows="3" required></textarea>
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">Orden (prioridad)</label>
+                  <input type="number" class="form-control" id="event-order" value="0" min="0">
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">Imagen (opcional)</label>
+                  <input type="file" class="form-control" id="event-image" accept="image/*">
+                  <div id="event-image-preview" class="mt-2"></div>
+                </div>
+                <button class="btn btn-primary w-100" type="submit">Guardar evento</button>
+              </form>
+            </div>
+          </div>
+          <div class="col-lg-8">
+            <div class="table-card p-3">
+              <div class="d-flex justify-content-between align-items-center mb-2">
+                <h6 class="mb-0">Eventos publicados</h6>
+              </div>
+              <div class="table-responsive">
+                <table class="table table-dark table-hover align-middle mb-0">
+                  <thead><tr><th style="width:60px;">Img</th><th>Título</th><th>Orden</th><th class="text-end">Acciones</th></tr></thead>
+                  <tbody id="events-table"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB ÁRBITROS (solo superadmin) -->
+      <div class="tab-pane fade" id="tab-arbitros">
+        <div class="row g-4">
+          <div class="col-lg-4">
+            <div class="panel-card p-4 h-100">
+              <h5 class="mb-3">Registrar árbitro</h5>
+              <form id="arbitro-form">
+                <div class="mb-3">
+                  <label class="form-label">Nombre</label>
+                  <input type="text" class="form-control" id="arbitro-nombre" required>
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">Apellidos</label>
+                  <input type="text" class="form-control" id="arbitro-apellidos" required>
+                </div>
+                <button class="btn btn-primary w-100" type="submit">Guardar árbitro</button>
+              </form>
+            </div>
+          </div>
+          <div class="col-lg-8">
+            <div class="table-card p-3">
+              <h6 class="mb-2">Árbitros registrados</h6>
+              <div class="table-responsive">
+                <table class="table table-dark table-hover align-middle mb-0">
+                  <thead><tr><th>Nombre</th><th>Apellidos</th><th class="text-end">Acciones</th></tr></thead>
+                  <tbody id="arbitros-table"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="tab-pane fade" id="tab-admins">
+        <div class="row g-4">
+          <div class="col-lg-5">
+            <div class="panel-card p-4 h-100">
+              <h5 class="mb-3">Registrar administrador</h5>
+              <form id="admin-form">
+                <div class="mb-3">
+                  <label class="form-label">Nombre</label>
+                  <input type="text" class="form-control" id="admin-name" required>
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">Email</label>
+                  <input type="email" class="form-control" id="admin-email" required>
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">Contraseña</label>
+                  <input type="password" class="form-control" id="admin-password" required>
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">Rol</label>
+                  <select class="form-select" id="admin-rol">
+                    <option value="equipo">Admin de equipo</option>
+                    <option value="super">Superadmin</option>
+                  </select>
+                </div>
+                <div class="mb-3" id="admin-team-wrap">
+                  <label class="form-label">Equipo asignado (requerido para admin de equipo)</label>
+                  <select class="form-select" id="admin-team"></select>
+                </div>
+                <button class="btn btn-primary w-100" type="submit">Crear administrador</button>
+              </form>
+              <div class="form-text mt-2">Solo superadmin puede crear nuevos accesos.</div>
+            </div>
+          </div>
+          <div class="col-lg-7">
+            <div class="table-card p-3">
+              <h6 class="mb-2">Administradores registrados</h6>
+              <div class="table-responsive">
+                <table class="table table-dark table-hover align-middle mb-0">
+                  <thead><tr><th>Nombre</th><th>Email</th><th>Rol</th><th>Equipo</th><th>Activo</th><th class="text-end">Acciones</th></tr></thead>
+                  <tbody id="admins-table"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="tab-pane fade" id="tab-bitacora">
+        <div class="table-card p-3">
+          <div class="d-flex justify-content-between align-items-center mb-2 flex-wrap gap-2">
+            <h6 class="mb-0">Bitácora de cambios</h6>
+            <select id="bitacora-filter-rol" class="form-select form-select-sm w-auto">
+              <option value="">Todos</option>
+              <option value="super">Solo superadmin</option>
+              <option value="equipo">Solo admin de equipo</option>
+            </select>
+          </div>
+          <div class="table-responsive">
+            <table class="table table-dark table-hover align-middle mb-0">
+              <thead><tr><th>Fecha</th><th>Administrador</th><th>Rol</th><th>Acción</th><th>Detalle</th></tr></thead>
+              <tbody id="bitacora-table"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <div class="modal fade" id="playerInfoModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+      <div class="modal-content bg-dark border-secondary">
+        <div class="modal-header border-secondary">
+          <h5 class="modal-title" id="playerInfoModalLabel">Ficha del jugador</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body text-light">
+          <div class="d-flex align-items-center gap-3 mb-3">
+            <img id="player-modal-photo" src="" alt="Foto del jugador" style="width:72px;height:72px;border-radius:50%;object-fit:cover;" class="d-none">
+            <div>
+              <h5 id="player-modal-name" class="mb-1">-</h5>
+              <div class="text-secondary">
+                <span id="player-modal-team">-</span>
+                <span class="mx-2">•</span>
+                <span id="player-modal-category">-</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="row g-3">
+            <div class="col-md-4"><strong>Número:</strong> <span id="player-modal-number">-</span></div>
+            <div class="col-md-4"><strong>Fecha nac.:</strong> <span id="player-modal-born">-</span></div>
+            <div class="col-md-4"><strong>Tipo sanguíneo:</strong> <span id="player-modal-blood">-</span></div>
+            <div class="col-md-4"><strong>Estatura:</strong> <span id="player-modal-height">-</span></div>
+            <div class="col-md-4"><strong>Peso:</strong> <span id="player-modal-weight">-</span></div>
+            <div class="col-md-4"><strong>Alergias:</strong> <span id="player-modal-allergies">-</span></div>
+            <div class="col-md-6"><strong>Nombre del papá:</strong> <span id="player-modal-father">-</span></div>
+            <div class="col-md-6"><strong>Nombre de la mamá:</strong> <span id="player-modal-mother">-</span></div>
+            <div class="col-md-6"><strong>Tel. casa:</strong> <span id="player-modal-phone-home">-</span></div>
+            <div class="col-md-6"><strong>Tel. mamá:</strong> <span id="player-modal-phone-mom">-</span></div>
+            <div class="col-md-6"><strong>Tel. papá:</strong> <span id="player-modal-phone-dad">-</span></div>
+            <div class="col-md-6"><strong>Escuela:</strong> <span id="player-modal-school">-</span></div>
+            <div class="col-md-12"><strong>Grado escolar:</strong> <span id="player-modal-grade">-</span></div>
+          </div>
+
+          <div id="player-edit-panel" class="mt-4 pt-3 border-top border-secondary d-none">
+            <h6 class="mb-3">Editar datos opcionales</h6>
+            <div class="row g-3">
+              <div class="col-md-4">
+                <label class="form-label">Estatura (m)</label>
+                <input id="player-edit-height" type="number" step="0.01" min="0.5" max="2.5" class="form-control">
+              </div>
+              <div class="col-md-4">
+                <label class="form-label">Peso (kg)</label>
+                <input id="player-edit-weight" type="number" step="0.1" min="10" max="200" class="form-control">
+              </div>
+              <div class="col-md-4">
+                <label class="form-label">Tipo sanguíneo</label>
+                <input id="player-edit-blood" type="text" class="form-control">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Alergias</label>
+                <input id="player-edit-allergies" type="text" class="form-control">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Escuela</label>
+                <input id="player-edit-school" type="text" class="form-control">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Nombre del papá</label>
+                <input id="player-edit-father" type="text" class="form-control">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Nombre de la mamá</label>
+                <input id="player-edit-mother" type="text" class="form-control">
+              </div>
+              <div class="col-md-4">
+                <label class="form-label">Tel. casa</label>
+                <input id="player-edit-phone-home" type="text" class="form-control">
+              </div>
+              <div class="col-md-4">
+                <label class="form-label">Tel. mamá</label>
+                <input id="player-edit-phone-mom" type="text" class="form-control">
+              </div>
+              <div class="col-md-4">
+                <label class="form-label">Tel. papá</label>
+                <input id="player-edit-phone-dad" type="text" class="form-control">
+              </div>
+              <div class="col-md-12">
+                <label class="form-label">Grado escolar</label>
+                <input id="player-edit-grade" type="text" class="form-control">
+              </div>
+            </div>
+            <div class="d-flex justify-content-end gap-2 mt-3">
+              <button type="button" class="btn btn-outline-light" id="player-modal-cancel">Cancelar</button>
+              <button type="button" class="btn btn-primary" id="player-modal-save">
+                <i class="fa-solid fa-floppy-disk me-1"></i>Guardar cambios
+              </button>
+            </div>
+          </div>
+
+          <div class="d-flex justify-content-end mt-4">
+            <button type="button" class="btn btn-outline-info" id="player-modal-edit">
+              <i class="fa-solid fa-pen-to-square me-1"></i>Editar
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast-container position-fixed bottom-0 end-0 p-3" id="toast-container"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+  <script src="admin.js?v=20260430a"></script>
+</body>
+</html>
